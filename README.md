@@ -2,15 +2,21 @@
 
 A Chrome extension that allows you to give kudos to multiple Strava activities with a single click.
 
+✅ Save Time
+✅ Give Kudos Faster
+✅ Boost Your Engagement
+
 ![Strava Kudos Plus](images/StravaKudosTile.png)
 
 ## Features
 
-- Adds a "Give X Kudos" button to your Strava dashboard, athlete pages, and club feeds
-- Automatically identifies activities that haven't received your kudos yet
-- Shows you exactly how many kudos you can give at a glance
-- Works seamlessly with Strava's interface
-- Respects Strava's rate limits to ensure smooth functionality
+- ⁠Beautifully redesigned "Give X Kudos" button that seamlessly integrates with Strava's interface
+- ⁠Intelligent, gradual kudos distribution system that respects Strava's rate limits
+- ⁠Unlike other extensions that dump all kudos at once, Strava Kudos Plus delivers them progressively
+- ⁠Full control to pause, switch groups, or reload the page to better distribute your kudos
+- ⁠Automatically identifies activities that haven't received your kudos yet
+- ⁠Clear counter shows exactly how many kudos you can give at a glance
+- ⁠Works flawlessly on your dashboard, athlete pages, and club feeds
 
 ## Installation
 
@@ -65,3 +71,18 @@ Contributions are welcome! Feel free to submit a pull request or open an issue i
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Release Notes
+
+ℹ️ **Version 0.22 - Visual & UX Improvements**
+
+•⁠  ⁠Completely redesigned the Kudos button with a modern, eye-catching UI
+•⁠  ⁠Added a smooth color gradient using Strava's official orange color scheme
+•⁠  ⁠Implemented hover and click animations for better visual feedback
+•⁠  ⁠Added a heart icon for better visual representation of the Kudos action
+•⁠  ⁠Improved button container with rounded corners and refined shadow effects
+•⁠  ⁠Enhanced the counter display with a semi-transparent background for better readability
+•⁠  ⁠Optimized button positioning and spacing for a cleaner look
+•⁠  ⁠No changes to core functionality - works exactly as before, just looks better!
+
+This update focuses entirely on visual improvements while maintaining the same reliable functionality that users love.
