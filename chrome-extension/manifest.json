@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Strava Kudos Plus",
   "description": "Automatically give kudos to Strava activities with one click",
-  "version": "0.21",
+  "version": "0.22",
   "action": {
     "default_icon": "icon.png"
   },

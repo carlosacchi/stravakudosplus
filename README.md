@@ -2,6 +2,8 @@
 
 A Chrome extension that allows you to give kudos to multiple Strava activities with a single click.
 
+![Strava Kudos Plus](images/StravaKudosTile.png)
+
 ## Features
 
 - Adds a "Give X Kudos" button to your Strava dashboard, athlete pages, and club feeds
