@@ -25,13 +25,6 @@ A Chrome extension that allows you to give kudos to multiple Strava activities w
 2. Click "Add to Chrome"
 3. Confirm the installation
 
-### Manual Installation (Developer Mode)
-1. Download or clone this repository
-2. Open Chrome and navigate to `chrome://extensions/`
-3. Enable "Developer mode" using the toggle in the top-right corner
-4. Click "Load unpacked" and select the `chrome-extension` folder from this repository
-5. The extension is now installed and ready to use
-
 ## Usage
 
 1. Navigate to your Strava dashboard, an athlete page, or a club page
