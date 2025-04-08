@@ -1,10 +1,31 @@
 (function () {
   let kudosBtns = []
-    , KUDOS_INTERVAL = 1000 // in millisecondi
+    , KUDOS_MIN_INTERVAL = 1000 // min interval in milliseconds
+    , KUDOS_MAX_INTERVAL = 4000 // max interval in milliseconds
     , KUDOS_LOCKOUT = 100
+    , KUDOS_STREAK_LENGTH = 12 // after this many kudos, take a longer pause
+    , LONG_PAUSE_MIN = 4000 // min long pause in milliseconds
+    , LONG_PAUSE_MAX = 10000 // max long pause in milliseconds
+    , SKIP_KUDOS_CHANCE = 0.05 // 5% chance to skip a kudos
+    , kudosGiven = 0 // counter for kudos given in current session
     , btn
     , viewingAthleteId
     , els = '[data-testid=\'unfilled_kudos\']';
+
+  // Helper function to get a random number between min and max
+  const getRandomInterval = (min, max) => {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+  };
+
+  // Helper function to determine if we should skip a kudos
+  const shouldSkipKudos = () => {
+    return Math.random() < SKIP_KUDOS_CHANCE;
+  };
+
+  // Helper function to determine if we should take a longer pause
+  const shouldTakeLongPause = () => {
+    return kudosGiven > 0 && kudosGiven % KUDOS_STREAK_LENGTH === 0;
+  };
 
   const init = () => {
     const styles = document.createElement('style');
@@ -89,7 +110,7 @@
     `;
     btn.className = 'hidden';
 
-    btn.addEventListener('click', giveKudos);
+    btn.addEventListener('click', startGivingKudos);
     document.body.prepend(btn);
     updateCountNum();
   };
@@ -99,16 +120,76 @@
     btn.dataset.testid = 'filled_kudos';
   };
 
-  // give ALL the kudos
+  // Start the process of giving kudos
+  const startGivingKudos = () => {
+    kudosGiven = 0; // Reset the counter when starting a new session
+    giveKudos();
+  };
+
+  // give kudos with more human-like behavior
   const giveKudos = () => {
+    // Generate random delay for this kudos operation
+    const delay = getRandomInterval(KUDOS_MIN_INTERVAL, KUDOS_MAX_INTERVAL);
+
+    // We'll put everything in a setTimeout to ensure the delay happens BEFORE each action
     setTimeout(() => {
-      const kudoBtn = getEligibleKudoButtons()?.[0];
-      if (kudoBtn) {
-        // mockFillKudo(kudoBtn); /* for testing purposes only */
-        kudoBtn.parentNode.click();
-        giveKudos();
+      const eligibleButtons = getEligibleKudoButtons();
+      const kudoBtn = eligibleButtons?.[0];
+
+      if (!kudoBtn) {
+        console.log('No more kudos to give');
+        return; // No more kudos to give
       }
-    }, KUDOS_INTERVAL);
+
+      // Make sure we have a valid button with a parent before continuing
+      if (!kudoBtn.parentNode) {
+        console.log('Found a kudos button with no valid parent, skipping');
+        giveKudos();
+        return;
+      }
+
+      // Determine if we should skip this kudos
+      if (shouldSkipKudos()) {
+        console.log('Randomly skipping a kudos to appear more human-like');
+        kudosGiven++; // Still count it as processed
+
+        // Move to the next kudos
+        giveKudos();
+        return;
+      }
+
+      // Determine if we should take a longer pause after a streak
+      if (shouldTakeLongPause()) {
+        const pauseTime = getRandomInterval(LONG_PAUSE_MIN, LONG_PAUSE_MAX);
+        console.log(`Taking a longer pause (${pauseTime}ms) after ${KUDOS_STREAK_LENGTH} kudos`);
+
+        setTimeout(() => {
+          try {
+            // After the pause, give the kudos and continue
+            kudoBtn.parentNode.click();
+            kudosGiven++;
+          } catch (error) {
+            console.log('Error clicking button after pause, continuing to next');
+          }
+
+          // Move to the next kudos
+          giveKudos();
+        }, pauseTime);
+
+        return;
+      }
+
+      // Standard case: give kudos
+      try {
+        kudoBtn.parentNode.click();
+        kudosGiven++;
+      } catch (error) {
+        console.log('Error clicking button, continuing to next');
+      }
+
+      // Move to the next kudos (which will have its own delay)
+      giveKudos();
+    }, delay);
   };
 
   // toggle box styles
@@ -131,15 +212,17 @@
     const activityAvatars = document.querySelectorAll('[data-testid="owner-avatar"]');
     const buttons = [];
 
-    activityAvatars.forEach(avatar => {
+    for (const avatar of activityAvatars) {
       // activity card is not your own
-      if (!avatar.href.includes(viewingAthleteId)) {
+      if (avatar && avatar.href && viewingAthleteId && !avatar.href.includes(viewingAthleteId)) {
         const activityCard = avatar.closest('[class*="--child-entry"]') /* group activity */ ||
           avatar.closest('[data-testid="web-feed-entry"]') /* solo activity */;
 
-        activityCard.querySelector(els) && buttons.push(activityCard.querySelector(els));
+        if (activityCard && activityCard.querySelector(els)) {
+          buttons.push(activityCard.querySelector(els));
+        }
       }
-    });
+    }
 
     return buttons;
   };
@@ -154,7 +237,7 @@
         kudosBtns = getEligibleKudoButtons();
         count.innerHTML = kudosBtns.length;
         toggleKudosBox();
-      }, KUDOS_INTERVAL);
+      }, 1000); // Keep this interval at 1 second for UI updates
     }
   };
 
