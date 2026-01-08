@@ -8,7 +8,6 @@
     , LONG_PAUSE_MAX = 10000 // max long pause in milliseconds
     , SKIP_KUDOS_CHANCE = 0.05 // 5% chance to skip a kudos
     , kudosGiven = 0 // counter for kudos given in current session
-    , processedActivities = new Set() // track processed activity IDs to prevent looping
     , btn
     , viewingAthleteId
     , els = '[data-testid=\'unfilled_kudos\']';
@@ -124,7 +123,6 @@
   // Start the process of giving kudos
   const startGivingKudos = () => {
     kudosGiven = 0; // Reset the counter when starting a new session
-    processedActivities.clear(); // Clear processed activities to allow re-processing after page refresh
     giveKudos();
   };
 
@@ -150,11 +148,6 @@
         return;
       }
 
-      // Get the activity ID for this button to track it
-      const activityCard = kudoBtn.closest('[class*="--child-entry"]') || kudoBtn.closest('[data-testid="web-feed-entry"]');
-      const avatar = activityCard?.querySelector('[data-testid="owner-avatar"]');
-      const activityId = activityCard?.dataset?.id || avatar?.href?.match(/\/(\d+)$/)?.[1] || avatar?.href || '';
-
       // Determine if we should skip this kudos
       if (shouldSkipKudos()) {
         console.log('Randomly skipping a kudos to appear more human-like');
@@ -175,10 +168,6 @@
             // After the pause, give the kudos and continue
             kudoBtn.parentNode.click();
             kudosGiven++;
-            // Mark this activity as processed to prevent looping
-            if (activityId) {
-              processedActivities.add(activityId);
-            }
           } catch (error) {
             console.log('Error clicking button after pause, continuing to next');
           }
@@ -194,10 +183,6 @@
       try {
         kudoBtn.parentNode.click();
         kudosGiven++;
-        // Mark this activity as processed to prevent looping
-        if (activityId) {
-          processedActivities.add(activityId);
-        }
       } catch (error) {
         console.log('Error clicking button, continuing to next');
       }
@@ -234,14 +219,6 @@
           avatar.closest('[data-testid="web-feed-entry"]') /* solo activity */;
 
         if (activityCard && activityCard.querySelector(els)) {
-          // Generate unique activity ID using the activity card's data attributes or fallback to href
-          const activityId = activityCard.dataset.id || avatar.href.match(/\/(\d+)$/)?.[1] || avatar.href;
-          
-          // Skip if this activity has already been processed (prevents looping on group activities)
-          if (processedActivities.has(activityId)) {
-            continue;
-          }
-          
           buttons.push(activityCard.querySelector(els));
         }
       }
