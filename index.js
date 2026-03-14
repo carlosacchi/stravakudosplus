@@ -126,6 +126,27 @@
     giveKudos();
   };
 
+  // Close any open kudos modal/popup
+  const handleKudosModal = () => {
+    const closeBtn = document.querySelector('[data-testid="modal-close-button"]');
+    if (closeBtn) {
+      closeBtn.click();
+    }
+  };
+
+  // Click the kudos button safely, handling group activity modals
+  const clickKudoButton = (kudoBtn) => {
+    kudoBtn.parentNode.click();
+
+    // After a short delay, check if a modal opened (group activity behavior)
+    setTimeout(() => {
+      handleKudosModal();
+    }, 300);
+
+    // Always mark button as filled to prevent re-clicking in case Strava doesn't update the DOM
+    mockFillKudo(kudoBtn);
+  };
+
   // give kudos with more human-like behavior
   const giveKudos = () => {
     // Generate random delay for this kudos operation
@@ -152,6 +173,7 @@
       if (shouldSkipKudos()) {
         console.log('Randomly skipping a kudos to appear more human-like');
         kudosGiven++; // Still count it as processed
+        mockFillKudo(kudoBtn); // Mark as processed so we don't revisit
 
         // Move to the next kudos
         giveKudos();
@@ -165,11 +187,11 @@
 
         setTimeout(() => {
           try {
-            // After the pause, give the kudos and continue
-            kudoBtn.parentNode.click();
+            clickKudoButton(kudoBtn);
             kudosGiven++;
           } catch (error) {
             console.log('Error clicking button after pause, continuing to next');
+            mockFillKudo(kudoBtn); // Mark as processed to avoid infinite loop
           }
 
           // Move to the next kudos
@@ -181,10 +203,11 @@
 
       // Standard case: give kudos
       try {
-        kudoBtn.parentNode.click();
+        clickKudoButton(kudoBtn);
         kudosGiven++;
       } catch (error) {
         console.log('Error clicking button, continuing to next');
+        mockFillKudo(kudoBtn); // Mark as processed to avoid infinite loop
       }
 
       // Move to the next kudos (which will have its own delay)
@@ -215,8 +238,12 @@
     for (const avatar of activityAvatars) {
       // activity card is not your own
       if (avatar && avatar.href && viewingAthleteId && !avatar.href.includes(viewingAthleteId)) {
-        const activityCard = avatar.closest('[class*="--child-entry"]') /* group activity */ ||
-          avatar.closest('[data-testid="web-feed-entry"]') /* solo activity */;
+        // Skip group activities (child entries) to avoid triggering kudos modal popup
+        if (avatar.closest('[class*="--child-entry"]')) {
+          continue;
+        }
+
+        const activityCard = avatar.closest('[data-testid="web-feed-entry"]');
 
         if (activityCard && activityCard.querySelector(els)) {
           buttons.push(activityCard.querySelector(els));
