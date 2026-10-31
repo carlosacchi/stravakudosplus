@@ -67,6 +67,23 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Release Notes
 
+### Version 1.29 - Strava profile menu compatibility
+
+- Recognizes Strava's current profile menu as well as the previous layout.
+- Retries profile detection as the page loads, so a delayed menu no longer leaves the button permanently hidden.
+- Compares exact athlete IDs when excluding your own activities.
+
+### Troubleshooting a missing button
+
+The button is only shown when the page contains eligible activities from other athletes.
+Version 1.28 depended on the old `.user-menu > a` profile link, which is no longer present
+in the current dashboard. Reinstalling that version does not resolve the problem.
+
+To test the fix locally, run `npm run build`, open `chrome://extensions`, enable Developer
+mode, and use **Load unpacked** to select `chrome-extension` (or reload it if already loaded).
+Disable the Web Store copy while testing to avoid running both versions, then reload Strava.
+The Web Store copy will receive the fix only after the new package is published.
+
 ℹ️ **Version 0.22 - Visual & UX Improvements**
 
 •⁠  ⁠Completely redesigned the Kudos button with a modern, eye-catching UI

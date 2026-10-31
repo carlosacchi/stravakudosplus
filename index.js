@@ -237,7 +237,8 @@
 
     for (const avatar of activityAvatars) {
       // activity card is not your own
-      if (avatar && avatar.href && viewingAthleteId && !avatar.href.includes(viewingAthleteId)) {
+      if (avatar && avatar.href && viewingAthleteId &&
+          avatar.href.match(/\/athletes\/(\d+)(?:\/|[?#]|$)/)?.[1] !== viewingAthleteId) {
         // Skip group activities (child entries) to avoid triggering kudos modal popup
         if (avatar.closest('[class*="--child-entry"]')) {
           continue;
@@ -257,14 +258,23 @@
   // publish number of kudos
   const updateCountNum = () => {
     const count = document.getElementById('stravaKudosCount');
-    viewingAthleteId = document.querySelector('.user-menu > a')?.href?.match(/\d+/)?.[0]; // store viewing athlete id
 
     if (count) {
-      setInterval(() => {
+      const refresh = () => {
+        const profile = document.querySelector('a#athlete-menu[href*="/athletes/"]') ||
+          document.querySelector('.user-menu > a');
+        viewingAthleteId = profile?.href?.match(/\/athletes\/(\d+)(?:\/|[?#]|$)/)?.[1];
         kudosBtns = getEligibleKudoButtons();
         count.innerHTML = kudosBtns.length;
         toggleKudosBox();
-      }, 1000); // Keep this interval at 1 second for UI updates
+        if (!viewingAthleteId) {
+          btn.title = 'Waiting for your Strava profile. If this persists, reload the page and check extension access to Strava.';
+        } else {
+          btn.removeAttribute('title');
+        }
+      };
+      refresh();
+      setInterval(refresh, 1000); // Keep this interval at 1 second for UI updates
     }
   };
 
