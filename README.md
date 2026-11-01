@@ -1,38 +1,50 @@
 # Strava Kudos Plus
 
-A Chrome extension that allows you to give kudos to multiple Strava activities with a single click.
+A Chrome extension that lets you give Kudos to eligible Strava activities with a single click.
 
-✅ Save Time
-✅ Give Kudos Faster
-✅ Boost Your Engagement
+**Current version: 1.30**
+
+[Install from the Chrome Web Store](https://chromewebstore.google.com/detail/strava-kudos-plus/bpdnpccpbmdpdhfnnnfnokbaijbbcadm)
 
 ![Strava Kudos Plus](images/StravaKudosTile.png)
 
 ## Features
 
-- ⁠Beautifully redesigned "Give X Kudos" button that seamlessly integrates with Strava's interface
-- ⁠Intelligent, gradual kudos distribution system that respects Strava's rate limits
-- ⁠Unlike other extensions that dump all kudos at once, Strava Kudos Plus delivers them progressively
-- ⁠Full control to pause, switch groups, or reload the page to better distribute your kudos
-- ⁠Automatically identifies activities that haven't received your kudos yet
-- ⁠Clear counter shows exactly how many kudos you can give at a glance
-- ⁠Works flawlessly on your dashboard, athlete pages, and club feeds
+- Orange "Give X Kudos" button with a live count of eligible activities on the current page.
+- Gradual distribution with randomized delays and longer pauses, rather than sending all Kudos at once.
+- Excludes your own activities, activities already given Kudos, and group child entries that can trigger modals.
+- Supports Strava dashboards, athlete pages, and club feeds.
+- Recognizes both current and legacy Strava profile menus and retries detection while the page loads.
+- Small, non-blocking Chrome Web Store review link below the button, visible only when eligible activities are available.
+- No analytics, tracking, or additional permissions for feedback.
 
 ## Installation
 
 ### From Chrome Web Store
-1. Visit [Strava Kudos Plus on the Chrome Web Store](#) *(add your extension link when available)*
+1. Visit [Strava Kudos Plus on the Chrome Web Store](https://chromewebstore.google.com/detail/strava-kudos-plus/bpdnpccpbmdpdhfnnnfnokbaijbbcadm)
 2. Click "Add to Chrome"
 3. Confirm the installation
 
 ## Usage
 
-1. Navigate to your Strava dashboard, an athlete page, or a club page
-2. Look for the "Give X Kudos" button at the top of the page
-3. Click the button to automatically give kudos to all eligible activities
-4. The extension will process each activity one by one
+1. Sign in to Strava and open your dashboard, an athlete page, or a club feed.
+2. Look for the "Give X Kudos" button near the top-left of the page. It appears only when your profile is detected and eligible activities are available.
+3. Click once to start processing activities one by one. Keep the page open while it runs.
+4. Scroll to load more activities as needed; the counter refreshes every second.
 
-Note: This extension only gives kudos to activities from other athletes. It will not give kudos to your own activities.
+### Limits and stopping
+
+- Strava may still throttle Kudos. Randomized delays do not guarantee avoiding its limits.
+- The extension intentionally skips a small random share of activities, so the counter is not a guarantee of Kudos successfully delivered.
+- There is no pause/resume button. Reload or leave the page to stop processing.
+- Only activities present in the page are processed; the extension does not automatically scroll or fetch the entire feed.
+
+### Share your feedback
+
+When the "Give X Kudos" button is visible, a small invitation underneath links to the
+Chrome Web Store. Click [**Leave a review on Chrome Web Store**](https://chromewebstore.google.com/detail/strava-kudos-plus/bpdnpccpbmdpdhfnnnfnokbaijbbcadm) to share your feedback
+in a new tab, without starting Kudos. The invitation disappears along with the button
+when no eligible activities remain. There are no popups, reminders, or review tracking.
 
 ## Building from Source
 
@@ -40,8 +52,11 @@ If you want to build the extension from source:
 
 1. Clone this repository
 2. Install dependencies with `npm install`
-3. Run `npm run build` to create the extension package
-4. The built extension will be available in the `chrome-extension` folder
+3. Run `npm run build` to create `chrome-extension/StravaKudos.zip`.
+4. Open `chrome://extensions`, enable **Developer mode**, and select **Load unpacked**.
+5. Select the `chrome-extension` folder, then reload Strava. Disable the Web Store copy while testing to avoid running both versions.
+
+Run `npm test` after building to check profile detection and feedback behavior in both the source and the packaged script.
 
 ## Privacy Policy
 
@@ -52,10 +67,13 @@ This extension does not collect, store, or transmit any personal data from users
 - It only interacts with the Strava website to identify and click kudos buttons
 - It does not access, collect, or store any personal information
 - It does not use cookies, analytics, or tracking technologies
-- It does not communicate with any external servers
+- The extension does not send personal data to external servers.
+- The feedback link opens the Chrome Web Store only when clicked; reviews are submitted there, not collected by the extension.
 
 **Permissions:**
-This extension only requires permission to access and modify content on Strava.com pages, which is necessary for its core functionality of adding and clicking the kudos button.
+This extension requests host access to `https://www.strava.com/*`. Its content script runs on dashboard, athlete, and club pages to add the interface and click Kudos buttons. The feedback invitation adds no permissions.
+
+See [PRIVACY.md](./PRIVACY.md) for the privacy policy.
 
 ## Contributing
 
@@ -67,6 +85,13 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Release Notes
 
+### Version 1.30 - Feedback invitation
+
+- Adds a small feedback invitation below the Kudos button, linking to the Chrome Web Store in a new tab.
+- Shows the invitation only while eligible activities are available, without interrupting Kudos or requesting a particular rating.
+- Adds no permissions, tracking, or changes to Kudos distribution.
+- Refreshes installation, usage, limitations, and local testing documentation with the official store link.
+
 ### Version 1.29 - Strava profile menu compatibility
 
 - Recognizes Strava's current profile menu as well as the previous layout.
@@ -75,11 +100,11 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ### Troubleshooting a missing button
 
-The button is only shown when the page contains eligible activities from other athletes.
+The button and feedback invitation are only shown when your profile is detected and the page contains eligible activities from other athletes.
 Version 1.28 depended on the old `.user-menu > a` profile link, which is no longer present
 in the current dashboard. Reinstalling that version does not resolve the problem.
 
-To test the fix locally, run `npm run build`, open `chrome://extensions`, enable Developer
+To test the current version locally, run `npm run build`, open `chrome://extensions`, enable Developer
 mode, and use **Load unpacked** to select `chrome-extension` (or reload it if already loaded).
 Disable the Web Store copy while testing to avoid running both versions, then reload Strava.
 The Web Store copy will receive the fix only after the new package is published.

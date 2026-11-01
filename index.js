@@ -9,6 +9,7 @@
     , SKIP_KUDOS_CHANCE = 0.05 // 5% chance to skip a kudos
     , kudosGiven = 0 // counter for kudos given in current session
     , btn
+    , panel
     , viewingAthleteId
     , els = '[data-testid=\'unfilled_kudos\']';
 
@@ -30,16 +31,26 @@
   const init = () => {
     const styles = document.createElement('style');
     styles.innerHTML = `
+      #stravaKudosPanel {
+        position: fixed;
+        top: 70px;
+        left: 15px;
+        z-index: 49;
+        font-family: 'Roboto', sans-serif;
+      }
+
+      #stravaKudosPanel.hidden {
+        display: none !important;
+        visibility: hidden !important;
+      }
+
       #stravaKudos {
         display: flex;
         flex-direction: column;
-        left: 15px;
+        width: 100%;
         font-size: 16px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         border-radius: 8px;
-        z-index: 49;
-        position: fixed;
-        top: 70px;
         background: linear-gradient(135deg, #FC5200, #FF7D4D);
         color: white;
         border: none;
@@ -94,11 +105,45 @@
         width: 16px;
         height: 16px;
       }
+
+      #stravaKudosFeedback {
+        margin-top: 6px;
+        padding: 8px 12px;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        background: white;
+        color: #444;
+        font-size: 12px;
+        line-height: 1.5;
+        text-align: center;
+      }
+
+      #stravaKudosReview {
+        display: block;
+        color: #b33a00;
+        font-weight: 600;
+        text-decoration: underline;
+      }
+
+      #stravaKudosReview:hover {
+        color: #812a00;
+      }
+
+      #stravaKudosReview:focus-visible {
+        outline: 2px solid #b33a00;
+        outline-offset: 2px;
+        border-radius: 2px;
+      }
     `;
     document.head.prepend(styles);
 
+    panel = document.createElement('div');
+    panel.id = 'stravaKudosPanel';
+    panel.className = 'hidden';
+
     btn = document.createElement('button');
     btn.id = 'stravaKudos';
+    btn.type = 'button';
     btn.innerHTML = `
       <div>
         <svg id="kudosIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
@@ -110,8 +155,22 @@
     `;
     btn.className = 'hidden';
 
+    const feedback = document.createElement('div');
+    feedback.id = 'stravaKudosFeedback';
+    feedback.textContent = 'Enjoying Strava Kudos Plus? Share your feedback.';
+
+    const reviewLink = document.createElement('a');
+    reviewLink.id = 'stravaKudosReview';
+    reviewLink.href = 'https://chromewebstore.google.com/detail/strava-kudos-plus/bpdnpccpbmdpdhfnnnfnokbaijbbcadm';
+    reviewLink.target = '_blank';
+    reviewLink.rel = 'noopener noreferrer';
+    reviewLink.textContent = 'Leave a review on Chrome Web Store';
+    reviewLink.setAttribute('aria-label', 'Leave a review on Chrome Web Store (opens in a new tab)');
+    feedback.append(reviewLink);
+
     btn.addEventListener('click', startGivingKudos);
-    document.body.prepend(btn);
+    panel.append(btn, feedback);
+    document.body.prepend(panel);
     updateCountNum();
   };
 
@@ -219,6 +278,7 @@
   const toggleKudosBox = () => {
     const num = kudosBtns.length;
     if (num) {
+      panel.classList.remove('hidden');
       btn.classList.remove('hidden');
 
       if (num < KUDOS_LOCKOUT) {
@@ -227,6 +287,7 @@
         btn.classList.remove('lockout');
       }
     } else {
+      panel.classList.add('hidden');
       btn.classList.add('hidden');
     }
   };
